@@ -1,23 +1,37 @@
 import axios from 'axios';
 import firebaseConfig from './apiKeys';
 
-const dbURL = firebaseConfig.databaseURL;
+const dbUrl = firebaseConfig.databaseURL;
 
 const getStudents = () => new Promise((resolve, reject) => {
-  axios.get(`${dbURL}/students.json`)
+  axios.get(`${dbUrl}/students.json`)
     .then((response) => resolve(Object.values(response.data)))
     .catch((error) => reject(error));
 });
 
 const addStudent = (obj) => new Promise((resolve, reject) => {
-  axios.post(`${dbURL}/students.json`, obj)
+  axios.post(`${dbUrl}/students.json`, obj)
     .then((response) => {
       const body = { firebaseKey: response.data.name };
-      axios.patch(`${dbURL}/students/${response.data.name}.json`, body)
+      axios.patch(`${dbUrl}/students/${response.data.name}.json`, body)
         .then(() => {
           getStudents().then((studentsArray) => resolve(studentsArray));
         });
     }).catch((error) => reject(error));
 });
 
-export default addStudent;
+const deleteStudent = (firebaseKey) => new Promise((resolve, reject) => {
+  axios.delete(`${dbUrl}/students/${firebaseKey}.json`)
+    .then(() => getStudents().then((studentsArray) => resolve(studentsArray)))
+    .catch((error) => reject(error));
+});
+
+const updateStudent = (student) => new Promise((resolve, reject) => {
+  axios.patch(`${dbUrl}/students/${student.firebaseKey}.json`, student)
+    .then(() => getStudents().then((studentsArray) => resolve(studentsArray)))
+    .catch((error) => reject(error));
+});
+
+export {
+  addStudent, getStudents, deleteStudent, updateStudent
+};

@@ -1,16 +1,27 @@
-import React from 'react';
-import firebase from 'firebase/app';
-import firebaseConfig from '../helpers/data/apiKeys';
-import StudentForm from '../StudentForm';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import './App.scss';
+import NavBar from '../components/NavBar';
+import Routes from '../helpers/Routes';
+import { getStudents } from '../helpers/data/StudentData';
 
 function App() {
-  firebase.initializeApp(firebaseConfig);
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    getStudents().then(setStudents);
+  }, []);
 
   return (
-    <div className='App'>
-      <StudentForm />
-    </div>
+    <>
+    <Router>
+      <NavBar />
+      <Routes
+      students={students}
+      setStudents={setStudents}
+      />
+    </Router>
+  </>
   );
 }
 
