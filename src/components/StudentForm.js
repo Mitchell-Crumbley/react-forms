@@ -11,7 +11,7 @@ const StudentForm = ({
   name,
   teacher,
   grade,
-  firebaseKey,
+  firebaseKey
 }) => {
   const [student, setStudent] = useState({
     name: name || '',
@@ -23,18 +23,28 @@ const StudentForm = ({
   const handleInputChange = (e) => {
     setStudent((prevState) => ({
       ...prevState,
-      [e.target.name]: e.target.name === 'grade' ? Number(e.target.value) : e.target.value,
+      [e.target.name]:
+        e.target.name === 'grade' ? Number(e.target.value) : e.target.value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (student.firebaseKey) {
-    // make call to updateStudent to update student and rerender the DOM
-      updateStudent(student).then((studentArray) => setStudents(studentArray));
+      // make call to updateStudent to update student and rerender the DOM
+      updateStudent(student).then(setStudents); // this is the same as below, just shorthand.
+      // updateStudent(student).then((studentArray) => setStudents(studentArray));
     } else {
-    // add a student to firebase
-      addStudent(student).then((studentArray) => setStudents(studentArray));
+      addStudent(student).then(setStudents); // this is the same as below, just shorthand.
+      // addStudent(student).then((studentArray) => setStudents(studentArray));
+
+      // clear inputs
+      setStudent({
+        name: '',
+        teacher: '',
+        grade: 0,
+        firebaseKey: null
+      });
     }
   };
 
