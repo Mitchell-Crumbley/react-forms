@@ -1,16 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import firebase from 'firebase/app';
-import firebaseConfig from '../helpers/data/apiKeys';
-import StudentForm from '../StudentForm';
-import './App.scss';
+import 'firebase/auth';
+import NavBar from '../components/NavBar';
+import { getStudents } from '../helpers/data/StudentData';
+import Routes from '../helpers/Routes';
 
 function App() {
-  firebase.initializeApp(firebaseConfig);
+  const [students, setStudents] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    getStudents().then(setStudents);
+  }, []);
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged((authed) => {
+      if (authed) {
+        const userInfoObj = {
+          fullName: authed.displayName,
+          profileImage: authed.photoURL,
+          uid: authed.uid,
+          username: authed.email.split('@')[0]
+        };
+        setUser(userInfoObj);
+      } else if (user || user === null) {
+        setUser(false);
+      }
+    });
+  }, []);
 
   return (
-    <div className='App'>
-      <StudentForm />
-    </div>
+    <>
+      <Router>
+        <NavBar user={user} />
+        <Routes
+          user={user}
+          students={students}
+          setStudents={setStudents}
+        />
+      </Router>
+    </>
   );
 }
 
